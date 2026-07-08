@@ -5,54 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tokageTube🦎 | Ultrafast Video Proxy</title>
     <style>
-        body {
-            background: #111111;
-            color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-        .logo {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #ff0000;
-            margin-bottom: 30px;
-        }
-        .search-box {
-            background: #222222;
-            border-radius: 30px;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            border: 1px solid #444;
-        }
-        .search-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            outline: none;
-        }
-        .search-btn {
-            background: #ff0000;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        body { background: #111111; color: #ffffff; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        .container { width: 100%; max-width: 600px; text-align: center; }
+        .logo { font-size: 3rem; font-weight: bold; color: #ff0000; margin-bottom: 30px; }
+        .search-box { background: #222222; border-radius: 30px; padding: 10px 20px; display: flex; align-items: center; border: 1px solid #444; }
+        .search-input { flex: 1; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; }
+        .search-btn { background: #ff0000; border: none; color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -66,31 +24,26 @@
         </form>
     </div>
 
+    <!-- 正しいファイルを読み込む -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
+    <script src="register-sw.js"></script>
     
     <script>
-        // サービスワーカーのパスを正しい位置に修正
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/uv/uv.sw.js', { scope: __uv$config.prefix });
-        }
-
         document.getElementById('proxy-form').addEventListener('submit', async e => {
             e.preventDefault();
             const input = document.getElementById('proxy-search').value.trim();
             if (!input) return;
-
             let url = input;
             if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
                 url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(input);
             } else if (!/^https?:\/\//i.test(input)) {
                 url = 'https://' + input;
             }
-
             if (typeof __uv$config !== 'undefined') {
                 window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
             } else {
-                alert('プロキシの準備中です。1〜2秒待ってから再度お試しください。');
+                alert('準備中です。少し待ってから再度お試しください。');
             }
         });
     </script>
