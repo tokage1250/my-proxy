@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tokageTube🦎 | Ultrafast Video Proxy</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        /* tokageTube専用のサイバー＆クールな追加デザイン */
+        body {
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        .logo-area {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #38ef7d, #11998e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 0px 20px rgba(56, 239, 125, 0.2);
+        }
+        .subtitle {
+            color: #8b9bb4;
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+        .search-box {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(56, 239, 125, 0.3);
+            border-radius: 50px;
+            padding: 5px 15px 5px 25px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        .search-box:focus-within {
+            border-color: #38ef7d;
+            box-shadow: 0 0 25px rgba(56, 239, 125, 0.4);
+            transform: translateY(-2px);
+        }
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px 0;
+        }
+        .search-input::placeholder {
+            color: #5f6d85;
+        }
+        .search-btn {
+            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+            border: none;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+        }
+        .search-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .footer-text {
+            margin-top: 60px;
+            color: #4a5568;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-area">tokageTube 🦎</div>
+        <div class="subtitle">Ultraviolet 高速分散ビデオプロキシシステム</div>
+
+        <form id="proxy-form">
+            <div class="search-box">
+                <input type="text" id="proxy-search" class="search-input" placeholder="YouTubeのURL、または動画のキーワードを入力...">
+                <button type="submit" class="search-btn">爆速視聴</button>
+            </div>
+        </form>
+
+        <div class="footer-text">
+            Powered by Ultraviolet Engine | Secured by tokage1250
+        </div>
+    </div>
+
+    <script src="uv/uv.bundle.js" defer></script>
+    <script src="uv/uv.config.js" defer></script>
+    <script>
+        document.getElementById('proxy-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            
+            const input = document.getElementById('proxy-search').value.trim();
+            if (!input) return;
+
+            let url = input;
+            // 簡易的なURL判定（httpから始まっていなくて、ドットを含まない場合はYouTube検索にする）
+            if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
+                url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(input);
+            } else if (!/^https?:\/\//i.test(input)) {
+                url = 'https://' + input;
+            }
+
+            // Ultravioletプロキシ経由のURLに変換して遷移
+            if (typeof __uv$config !== 'undefined') {
+                window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            } else {
+                alert('プロキシスクリプトの読み込み中です。1〜2秒待ってから再度お試しください。');
+            }
+        });
+    </script>
+</body>
+</html>
