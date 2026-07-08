@@ -61,7 +61,7 @@
             transition: all 0.3s ease;
         }
         .card:hover {
-            border-color: #fff;
+            border-color: #38ef7d;
             transform: translateY(-5px);
         }
         .card-icon {
@@ -147,21 +147,17 @@
     <h1>Ultraviolet | TN</h1>
     <p>好きなサイトを自由に検索してみましょう！</p>
 
-    <!-- メイン検索 -->
     <form id="main-form" class="search-container">
         <input type="text" id="main-search" placeholder="キーワード、もしくはURLを入力...">
     </form>
 
-    <!-- 下のアイコン群 -->
     <div class="cards-wrapper">
-        <!-- 漫画ろうカード（押すとポップアップが開く） -->
         <div class="card" onclick="openMangaModal()">
             <div class="card-icon manga">📖</div>
             <div class="card-title">漫画ろう</div>
             <div class="card-desc">各種漫画サイトを選択して開く</div>
         </div>
 
-        <!-- tokageTubeカード（押すと直接tube.htmlに飛ぶ） -->
         <a href="tube.html" class="card">
             <div class="card-icon">🦎</div>
             <div class="card-title">tokageTube</div>
@@ -169,7 +165,6 @@
         </a>
     </div>
 
-    <!-- 使い方ガイドエリア -->
     <div class="guide-section">
         <div class="guide-box">
             <div class="guide-title">📋 ステップ1</div>
@@ -181,7 +176,6 @@
         </div>
     </div>
 
-    <!-- 漫画ろうポップアップ -->
     <div id="manga-modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeMangaModal()">&times;</span>
@@ -193,27 +187,26 @@
         </div>
     </div>
 
-    <!-- プロキシ必須ファイル -->
-    <script src="baremux/index.js"></script>
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     
     <script>
-        // サービスワーカー登録
+        // 正しいパス（/uv/uv.sw.js）に完全修正
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js', { scope: __uv$config.prefix });
+            navigator.serviceWorker.register('/uv/uv.sw.js', { scope: __uv$config.prefix });
         }
 
-        // ポップアップの操作
         function openMangaModal() { document.getElementById('manga-modal').style.display = 'flex'; }
         function closeMangaModal() { document.getElementById('manga-modal').style.display = 'none'; }
 
-        // プロキシ経由でURLを開く関数
         function openProxy(url) {
-            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            if (typeof __uv$config !== 'undefined') {
+                window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            } else {
+                alert('プロキシの準備中です。1〜2秒待ってからもう一度押してください。');
+            }
         }
 
-        // メイン検索バーの処理
         document.getElementById('main-form').addEventListener('submit', async e => {
             e.preventDefault();
             const input = document.getElementById('main-search').value.trim();
