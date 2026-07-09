@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultraviolet | Sophisticated Web Proxy</title>
+    <title>Ultraviolet | TN</title>
     <style>
         body {
             background-color: #1a1c23;
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 50px 20px;
             display: flex;
@@ -17,50 +17,95 @@
         }
         h1 { margin-bottom: 5px; }
         p { color: #888; margin-bottom: 40px; }
+        
         .search-container {
-            width: 100%; max-width: 600px; background: #2a2d36; border-radius: 30px;
-            padding: 10px 20px; display: flex; margin-bottom: 60px;
+            width: 100%; 
+            max-width: 600px; 
+            background: #2a2d36; 
+            border-radius: 30px;
+            padding: 10px 20px; 
+            display: flex; 
+            margin-bottom: 60px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .search-container input {
-            flex: 1; background: transparent; border: none; color: white; font-size: 1rem; outline: none;
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            color: white; 
+            font-size: 1rem; 
+            outline: none;
         }
-        .cards-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 50px; }
+        
+        .cards-wrapper { 
+            display: flex; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            margin-bottom: 50px; 
+        }
         .card {
-            background: transparent; border: 2px solid #444; border-radius: 15px; width: 140px; height: 180px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; text-decoration: none; color: white; transition: all 0.3s ease;
+            background: #222530; 
+            border: 2px solid #3a3f50; 
+            border-radius: 15px; 
+            width: 140px; 
+            height: 180px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer; 
+            text-decoration: none; 
+            color: white; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .card:hover { border-color: #38ef7d; transform: translateY(-5px); }
+        .card:hover { 
+            border-color: #38ef7d; 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 25px rgba(56, 239, 125, 0.2);
+        }
         .card-icon {
-            width: 70px; height: 70px; background: #ff0000; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 15px;
+            width: 70px; 
+            height: 70px; 
+            background: #ff0000; 
+            border-radius: 15px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 2rem; 
+            margin-bottom: 15px;
         }
         .card-icon.manga { background: #4a90e2; }
         .card-title { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; text-align: center; }
-        .card-desc { font-size: 0.7rem; color: #888; text-align: center; }
+        .card-desc { font-size: 0.7rem; color: #888; text-align: center; padding: 0 10px; }
+        
         .guide-section { width: 100%; max-width: 600px; border-top: 1px solid #333; padding-top: 40px; margin-top: 10px; }
         .guide-box { background: #222530; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #2a2d36; }
         .guide-title { font-size: 1.1rem; font-weight: bold; color: #38ef7d; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
         .guide-text { color: #cccccc; font-size: 0.95rem; line-height: 1.6; }
+        
         #manga-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-content { background: #2a2d36; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
         .close-btn { float: right; cursor: pointer; font-size: 1.5rem; color: #888; }
         .manga-btn {
-            display: block; width: 100%; padding: 15px; margin: 10px 0; background: #444; color: white;
-            border: none; border-radius: 10px; font-size: 1rem; cursor: pointer;
+            display: block; width: 100%; padding: 15px; margin: 10px 0; background: #3e4251; color: white;
+            border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; font-weight: bold;
         }
-        .manga-btn:hover { background: #555; }
+        .manga-btn:hover { background: #4f5468; border-left: 4px solid #4a90e2; }
     </style>
 </head>
 <body>
     <h1>Ultraviolet | TN</h1>
     <p>好きなサイトを自由に検索してみましょう！</p>
+    
     <form id="main-form" class="search-container">
-        <input type="text" id="main-search" placeholder="キーワード、もしくはURLを入力...">
+        <input type="text" id="main-search" placeholder="キーワード、もしくはURLを入力..." required>
     </form>
+    
     <div class="cards-wrapper">
         <div class="card" onclick="openMangaModal()">
             <div class="card-icon manga">📖</div>
@@ -70,17 +115,25 @@
         <a href="tube.html" class="card">
             <div class="card-icon">🦎</div>
             <div class="card-title">tokageTube</div>
-            <div class="card-desc">超高速で動画を<br>視聴する</div>
+            <div class="card-desc">超高速で動画を視聴する</div>
         </a>
     </div>
+    
     <div class="guide-section">
-        <div class="guide-box"><div class="guide-title">📋 ステップ1</div><div class="guide-text">1. 調べたいものを検索する</div></div>
-        <div class="guide-box"><div class="guide-title">🚀 ステップ2</div><div class="guide-text">上の検索バーや各種カードアイコンを使って、ブロックを回避しながら好きなWebサイトへ自由にアクセスできます。</div></div>
+        <div class="guide-box">
+            <div class="guide-title">📋 ステップ1</div>
+            <div class="guide-text">1. 調べたいものを検索する</div>
+        </div>
+        <div class="guide-box">
+            <div class="guide-title">🚀 ステップ2</div>
+            <div class="guide-text">上の検索バーや各種カードアイコンを使って、ブロックを回避しながら好きなWebサイトへ自由にアクセスできます。</div>
+        </div>
     </div>
+    
     <div id="manga-modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeMangaModal()">&times;</span>
-            <h2 style="margin-top:0;">漫画サイトを選択</h2>
+            <h2 style="margin-top:0; color:#4a90e2;">📖 漫画サイトを選択</h2>
             <button class="manga-btn" onclick="openProxy('https://klmanga.news')">klmanga.news を開く</button>
             <button class="manga-btn" onclick="openProxy('https://mangaraw.love')">mangaraw.love を開く</button>
             <button class="manga-btn" onclick="openProxy('https://dokiraw.in')">dokiraw.in を開く</button>
@@ -88,7 +141,7 @@
         </div>
     </div>
 
-    <!-- あなたのプロジェクトに合った正しいファイルを読み込む -->
+    <!-- エラーの原因だったbaremuxを削除し、環境に合ったファイルを読み込む -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
@@ -96,17 +149,20 @@
     <script>
         function openMangaModal() { document.getElementById('manga-modal').style.display = 'flex'; }
         function closeMangaModal() { document.getElementById('manga-modal').style.display = 'none'; }
+        
         function openProxy(url) {
             if (typeof __uv$config !== 'undefined') {
                 window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
             } else {
-                alert('プロキシの準備中です。1〜2秒待ってからもう一度押してください。');
+                alert('プロキシエンジンの起動を待っています。1〜2秒後にもう一度お試しください。');
             }
         }
+        
         document.getElementById('main-form').addEventListener('submit', async e => {
             e.preventDefault();
             const input = document.getElementById('main-search').value.trim();
             if (!input) return;
+            
             let url = input;
             if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
                 url = 'https://www.google.com/search?q=' + encodeURIComponent(input);
