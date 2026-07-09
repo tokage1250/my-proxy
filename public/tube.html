@@ -17,38 +17,27 @@
 <body>
     <div class="container">
         <div class="logo">tokageTube 🦎</div>
-        <!-- 干渉を防ぐ専用ID -->
-        <form id="tokage-tube-form">
+        <!-- 元のプログラムと連動しつつ、YouTube専用検索に切り替える隠しパーツ -->
+        <form id="uv-form">
             <div class="search-box">
-                <input type="text" id="tokage-tube-search" class="search-input" placeholder="YouTubeのURL、またはキーワードを入力..." required>
+                <input type="text" id="uv-address" class="search-input" placeholder="YouTubeのURL、またはキーワードを入力..." required>
+                <input type="hidden" id="uv-search-engine" value="https://www.youtube.com/results?search_query=%s">
                 <button type="submit" class="search-btn">爆速視聴</button>
             </div>
         </form>
     </div>
 
-    <!-- コアファイルのみ -->
+    <!-- エラー回避用の隠しエリア -->
+    <div style="display:none;">
+        <p id="uv-error"></p>
+        <pre id="uv-error-code"></pre>
+    </div>
+
+    <!-- ここでエンジンキーを読み込みます -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
-    
-    <script>
-        document.getElementById('tokage-tube-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const input = document.getElementById('tokage-tube-search').value.trim();
-            if (!input) return;
-            
-            let url = input;
-            if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
-                url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(input);
-            } else if (!/^https?:\/\//i.test(input)) {
-                url = 'https://' + input;
-            }
-            
-            if ('serviceWorker' in navigator) {
-                await navigator.serviceWorker.ready;
-            }
-            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-        });
-    </script>
+    <script src="search.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
