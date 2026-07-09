@@ -52,37 +52,20 @@
 <body>
     <div class="container">
         <div class="logo">tokageTube 🦎</div>
-        <form id="youtube-form">
+        <!-- 既存機能と連動するIDに修正 -->
+        <form id="uv-form">
             <div class="search-box">
-                <input type="text" id="youtube-search" class="search-input" placeholder="YouTubeのURL、またはキーワードを入力..." required>
+                <input type="text" id="uv-address" class="search-input" placeholder="YouTubeのURL、またはキーワードを入力..." required>
                 <button type="submit" class="search-btn">爆速視聴</button>
             </div>
         </form>
     </div>
 
+    <!-- 元々のファイルを読み込む -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
-    
-    <script>
-        document.getElementById('youtube-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const input = document.getElementById('youtube-search').value.trim();
-            if (!input) return;
-            
-            let url = input;
-            if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
-                url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(input);
-            } else if (!/^https?:\/\//i.test(input)) {
-                url = 'https://' + input;
-            }
-            
-            if (typeof __uv$config !== 'undefined') {
-                window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-            } else {
-                alert('動画エンジンを起動しています。1〜2秒後にもう一度お試しください。');
-            }
-        });
-    </script>
+    <script src="search.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
