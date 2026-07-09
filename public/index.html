@@ -102,7 +102,7 @@
     <h1>Ultraviolet | TN</h1>
     <p>好きなサイトを自由に検索してみましょう！</p>
     
-    <!-- あなたのプロジェクトの標準スクリプトが自動連動するIDに修正 -->
+    <!-- 既存のプロキシ機能と連動する正しいID -->
     <form id="uv-form" class="search-container">
         <input type="text" id="uv-address" placeholder="キーワード、もしくはURLを入力..." required>
     </form>
@@ -142,37 +142,26 @@
         </div>
     </div>
 
-    <!-- あなたのプロジェクトの裏方ファイルを正確に読み込む（競合を排除） -->
+    <!-- あなたのプロジェクトに元々あるファイルを読み込む（これがないと動きません） -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
+    <script src="search.js"></script>
+    <script src="index.js"></script>
     
     <script>
         function openMangaModal() { document.getElementById('manga-modal').style.display = 'flex'; }
         function closeMangaModal() { document.getElementById('manga-modal').style.display = 'none'; }
         
-        function openProxy(url) {
-            if (typeof __uv$config !== 'undefined') {
-                window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-            } else {
-                alert('プロキシを起動しています。1〜2秒後にもう一度お試しください。');
+        async function openProxy(url) {
+            // エンジンが完全に起動するまで待つ（これがNot Foundを防ぐ最大の鍵です）
+            if (typeof registerSW === 'function') {
+                await registerSW();
+            } else if ('serviceWorker' in navigator) {
+                await navigator.serviceWorker.ready;
             }
+            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
         }
-
-        // 検索ボタンを押したときの処理をテンプレートの純正エンジンに安全に橋渡し
-        document.getElementById('uv-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const input = document.getElementById('uv-address').value.trim();
-            if (!input) return;
-            
-            let url = input;
-            if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
-                url = 'https://www.google.com/search?q=' + encodeURIComponent(input);
-            } else if (!/^https?:\/\//i.test(input)) {
-                url = 'https://' + input;
-            }
-            openProxy(url);
-        });
     </script>
 </body>
 </html>
