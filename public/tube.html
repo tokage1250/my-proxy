@@ -5,67 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tokageTube🦎 | Ultrafast Video Proxy</title>
     <style>
-        body { 
-            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
-            color: #ffffff; 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-        }
+        body { background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%); color: #ffffff; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
         .container { width: 100%; max-width: 600px; text-align: center; }
-        .logo { 
-            font-size: 3rem; 
-            font-weight: bold; 
-            background: linear-gradient(45deg, #ff0000, #ff4e50);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 30px; 
-            text-shadow: 0px 0px 20px rgba(255, 0, 0, 0.3);
-        }
-        .search-box { 
-            background: rgba(255, 255, 255, 0.05); 
-            border-radius: 30px; 
-            padding: 10px 20px; 
-            display: flex; 
-            align-items: center; 
-            border: 2px solid rgba(255, 0, 0, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
+        .logo { font-size: 3rem; font-weight: bold; background: linear-gradient(45deg, #ff0000, #ff4e50); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; text-shadow: 0px 0px 20px rgba(255, 0, 0, 0.3); }
+        .search-box { background: rgba(255, 255, 255, 0.05); border-radius: 30px; padding: 10px 20px; display: flex; align-items: center; border: 2px solid rgba(255, 0, 0, 0.3); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
         .search-input { flex: 1; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; }
-        .search-btn { 
-            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); 
-            border: none; 
-            color: white; 
-            padding: 12px 25px; 
-            border-radius: 20px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: transform 0.2s;
-        }
+        .search-btn { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); border: none; color: white; padding: 12px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
         .search-btn:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">tokageTube 🦎</div>
-        <!-- 既存機能と連動するIDに修正 -->
-        <form id="uv-form">
+        <!-- 干渉を防ぐ専用ID -->
+        <form id="tokage-tube-form">
             <div class="search-box">
-                <input type="text" id="uv-address" class="search-input" placeholder="YouTubeのURL、またはキーワードを入力..." required>
+                <input type="text" id="tokage-tube-search" class="search-input" placeholder="YouTubeのURL、またはキーワードを入力..." required>
                 <button type="submit" class="search-btn">爆速視聴</button>
             </div>
         </form>
     </div>
 
-    <!-- 元々のファイルを読み込む -->
+    <!-- コアファイルのみ -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
-    <script src="search.js"></script>
-    <script src="index.js"></script>
+    
+    <script>
+        document.getElementById('tokage-tube-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const input = document.getElementById('tokage-tube-search').value.trim();
+            if (!input) return;
+            
+            let url = input;
+            if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
+                url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(input);
+            } else if (!/^https?:\/\//i.test(input)) {
+                url = 'https://' + input;
+            }
+            
+            if ('serviceWorker' in navigator) {
+                await navigator.serviceWorker.ready;
+            }
+            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+        });
+    </script>
 </body>
 </html>
