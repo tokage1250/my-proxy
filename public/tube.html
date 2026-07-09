@@ -52,23 +52,22 @@
 <body>
     <div class="container">
         <div class="logo">tokageTube 🦎</div>
-        <form id="proxy-form">
+        <form id="youtube-form">
             <div class="search-box">
-                <input type="text" id="proxy-search" class="search-input" placeholder="YouTubeのURL、またはキーワードを入力..." required>
+                <input type="text" id="youtube-search" class="search-input" placeholder="YouTubeのURL、またはキーワードを入力..." required>
                 <button type="submit" class="search-btn">爆速視聴</button>
             </div>
         </form>
     </div>
 
-    <!-- エラーの原因だったbaremuxを削除し、環境に合ったファイルを読み込む -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
     
     <script>
-        document.getElementById('proxy-form').addEventListener('submit', async e => {
+        document.getElementById('youtube-form').addEventListener('submit', async e => {
             e.preventDefault();
-            const input = document.getElementById('proxy-search').value.trim();
+            const input = document.getElementById('youtube-search').value.trim();
             if (!input) return;
             
             let url = input;
@@ -81,7 +80,7 @@
             if (typeof __uv$config !== 'undefined') {
                 window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
             } else {
-                alert('プロキシエンジンの起動を待っています。1〜2秒後にもう一度お試しください。');
+                alert('動画エンジンを起動しています。1〜2秒後にもう一度お試しください。');
             }
         });
     </script>
