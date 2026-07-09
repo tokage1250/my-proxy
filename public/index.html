@@ -50,10 +50,18 @@
     <h1>Ultraviolet | TN</h1>
     <p>好きなサイトを自由に検索してみましょう！</p>
     
-    <!-- 古いファイルの干渉を防ぐための専用ID -->
-    <form id="tokage-main-form" class="search-container">
-        <input type="text" id="tokage-main-search" placeholder="キーワード、もしくはURLを入力..." required>
+    <!-- ここが一番重要：あなたの元のプログラムと完璧に連動するIDと隠しパーツ -->
+    <form id="uv-form" class="search-container">
+        <input type="text" id="uv-address" placeholder="キーワード、もしくはURLを入力..." required>
+        <!-- 検索エンジンをGoogleに指定（画面には見えません） -->
+        <input type="hidden" id="uv-search-engine" value="https://www.google.com/search?q=%s">
     </form>
+    
+    <!-- 元のプログラムがエラーを起こさないための隠しエラー表示エリア -->
+    <div style="display:none;">
+        <p id="uv-error"></p>
+        <pre id="uv-error-code"></pre>
+    </div>
     
     <div class="cards-wrapper">
         <div class="card" onclick="openMangaModal()">
@@ -84,36 +92,22 @@
         </div>
     </div>
 
-    <!-- エンジン起動に必要なコアファイルだけを読み込む（干渉するファイルは外しました） -->
+    <!-- ここであなたの完璧なエンジンキーを読み込みます -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
+    <script src="search.js"></script>
+    <script src="index.js"></script>
     
     <script>
         function openMangaModal() { document.getElementById('manga-modal').style.display = 'flex'; }
         function closeMangaModal() { document.getElementById('manga-modal').style.display = 'none'; }
         
-        async function openProxy(url) {
-            // エンジンが完全にスタンバイするまで強制的に待つ（Not Found防止策）
-            if ('serviceWorker' in navigator) {
-                await navigator.serviceWorker.ready;
-            }
-            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+        // 漫画ボタンを押した時、元のプログラムにURLを渡して検索ボタンを自動で押してもらう仕組み
+        function openProxy(url) {
+            document.getElementById('uv-address').value = url;
+            document.getElementById('uv-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
         }
-
-        document.getElementById('tokage-main-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const input = document.getElementById('tokage-main-search').value.trim();
-            if (!input) return;
-            
-            let url = input;
-            if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
-                url = 'https://www.google.com/search?q=' + encodeURIComponent(input);
-            } else if (!/^https?:\/\//i.test(input)) {
-                url = 'https://' + input;
-            }
-            openProxy(url);
-        });
     </script>
 </body>
 </html>
