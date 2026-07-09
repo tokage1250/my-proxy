@@ -17,84 +17,32 @@
         }
         h1 { margin-bottom: 5px; }
         p { color: #888; margin-bottom: 40px; }
-        
         .search-container {
-            width: 100%; 
-            max-width: 600px; 
-            background: #2a2d36; 
-            border-radius: 30px;
-            padding: 10px 20px; 
-            display: flex; 
-            margin-bottom: 60px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 100%; max-width: 600px; background: #2a2d36; border-radius: 30px;
+            padding: 10px 20px; display: flex; margin-bottom: 60px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .search-container input {
-            flex: 1; 
-            background: transparent; 
-            border: none; 
-            color: white; 
-            font-size: 1rem; 
-            outline: none;
+            flex: 1; background: transparent; border: none; color: white; font-size: 1rem; outline: none;
         }
-        
-        .cards-wrapper { 
-            display: flex; 
-            gap: 20px; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            margin-bottom: 50px; 
-        }
+        .cards-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 50px; }
         .card {
-            background: #222530; 
-            border: 2px solid #3a3f50; 
-            border-radius: 15px; 
-            width: 140px; 
-            height: 180px;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            cursor: pointer; 
-            text-decoration: none; 
-            color: white; 
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background: #222530; border: 2px solid #3a3f50; border-radius: 15px; width: 140px; height: 180px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; text-decoration: none; color: white; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .card:hover { 
-            border-color: #38ef7d; 
-            transform: translateY(-5px); 
-            box-shadow: 0 8px 25px rgba(56, 239, 125, 0.2);
-        }
-        .card-icon {
-            width: 70px; 
-            height: 70px; 
-            background: #ff0000; 
-            border-radius: 15px;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 2rem; 
-            margin-bottom: 15px;
-        }
+        .card:hover { border-color: #38ef7d; transform: translateY(-5px); box-shadow: 0 8px 25px rgba(56, 239, 125, 0.2); }
+        .card-icon { width: 70px; height: 70px; background: #ff0000; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 15px; }
         .card-icon.manga { background: #4a90e2; }
         .card-title { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; text-align: center; }
         .card-desc { font-size: 0.7rem; color: #888; text-align: center; padding: 0 10px; }
-        
         .guide-section { width: 100%; max-width: 600px; border-top: 1px solid #333; padding-top: 40px; margin-top: 10px; }
         .guide-box { background: #222530; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #2a2d36; }
         .guide-title { font-size: 1.1rem; font-weight: bold; color: #38ef7d; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
         .guide-text { color: #cccccc; font-size: 0.95rem; line-height: 1.6; }
-        
-        #manga-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000;
-        }
+        #manga-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: #2a2d36; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
         .close-btn { float: right; cursor: pointer; font-size: 1.5rem; color: #888; }
-        .manga-btn {
-            display: block; width: 100%; padding: 15px; margin: 10px 0; background: #3e4251; color: white;
-            border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; font-weight: bold;
-        }
+        .manga-btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #3e4251; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; font-weight: bold; }
         .manga-btn:hover { background: #4f5468; border-left: 4px solid #4a90e2; }
     </style>
 </head>
@@ -102,9 +50,9 @@
     <h1>Ultraviolet | TN</h1>
     <p>好きなサイトを自由に検索してみましょう！</p>
     
-    <!-- 既存のプロキシ機能と連動する正しいID -->
-    <form id="uv-form" class="search-container">
-        <input type="text" id="uv-address" placeholder="キーワード、もしくはURLを入力..." required>
+    <!-- 古いファイルの干渉を防ぐための専用ID -->
+    <form id="tokage-main-form" class="search-container">
+        <input type="text" id="tokage-main-search" placeholder="キーワード、もしくはURLを入力..." required>
     </form>
     
     <div class="cards-wrapper">
@@ -121,14 +69,8 @@
     </div>
     
     <div class="guide-section">
-        <div class="guide-box">
-            <div class="guide-title">📋 ステップ1</div>
-            <div class="guide-text">1. 調べたいものを検索する</div>
-        </div>
-        <div class="guide-box">
-            <div class="guide-title">🚀 ステップ2</div>
-            <div class="guide-text">上の検索バーや各種カードアイコンを使って、ブロックを回避しながら好きなWebサイトへ自由にアクセスできます。</div>
-        </div>
+        <div class="guide-box"><div class="guide-title">📋 ステップ1</div><div class="guide-text">1. 調べたいものを検索する</div></div>
+        <div class="guide-box"><div class="guide-title">🚀 ステップ2</div><div class="guide-text">上の検索バーや各種カードアイコンを使って、ブロックを回避しながら好きなWebサイトへ自由にアクセスできます。</div></div>
     </div>
     
     <div id="manga-modal">
@@ -142,26 +84,36 @@
         </div>
     </div>
 
-    <!-- あなたのプロジェクトに元々あるファイルを読み込む（これがないと動きません） -->
+    <!-- エンジン起動に必要なコアファイルだけを読み込む（干渉するファイルは外しました） -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
-    <script src="search.js"></script>
-    <script src="index.js"></script>
     
     <script>
         function openMangaModal() { document.getElementById('manga-modal').style.display = 'flex'; }
         function closeMangaModal() { document.getElementById('manga-modal').style.display = 'none'; }
         
         async function openProxy(url) {
-            // エンジンが完全に起動するまで待つ（これがNot Foundを防ぐ最大の鍵です）
-            if (typeof registerSW === 'function') {
-                await registerSW();
-            } else if ('serviceWorker' in navigator) {
+            // エンジンが完全にスタンバイするまで強制的に待つ（Not Found防止策）
+            if ('serviceWorker' in navigator) {
                 await navigator.serviceWorker.ready;
             }
             window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
         }
+
+        document.getElementById('tokage-main-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const input = document.getElementById('tokage-main-search').value.trim();
+            if (!input) return;
+            
+            let url = input;
+            if (!/^https?:\/\//i.test(input) && !input.includes('.')) {
+                url = 'https://www.google.com/search?q=' + encodeURIComponent(input);
+            } else if (!/^https?:\/\//i.test(input)) {
+                url = 'https://' + input;
+            }
+            openProxy(url);
+        });
     </script>
 </body>
 </html>
