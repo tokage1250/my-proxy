@@ -102,8 +102,9 @@
     <h1>Ultraviolet | TN</h1>
     <p>好きなサイトを自由に検索してみましょう！</p>
     
-    <form id="main-form" class="search-container">
-        <input type="text" id="main-search" placeholder="キーワード、もしくはURLを入力..." required>
+    <!-- あなたのプロジェクトの標準スクリプトが自動連動するIDに修正 -->
+    <form id="uv-form" class="search-container">
+        <input type="text" id="uv-address" placeholder="キーワード、もしくはURLを入力..." required>
     </form>
     
     <div class="cards-wrapper">
@@ -141,7 +142,7 @@
         </div>
     </div>
 
-    <!-- エラーの原因だったbaremuxを削除し、環境に合ったファイルを読み込む -->
+    <!-- あなたのプロジェクトの裏方ファイルを正確に読み込む（競合を排除） -->
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
@@ -154,13 +155,14 @@
             if (typeof __uv$config !== 'undefined') {
                 window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
             } else {
-                alert('プロキシエンジンの起動を待っています。1〜2秒後にもう一度お試しください。');
+                alert('プロキシを起動しています。1〜2秒後にもう一度お試しください。');
             }
         }
-        
-        document.getElementById('main-form').addEventListener('submit', async e => {
+
+        // 検索ボタンを押したときの処理をテンプレートの純正エンジンに安全に橋渡し
+        document.getElementById('uv-form').addEventListener('submit', async e => {
             e.preventDefault();
-            const input = document.getElementById('main-search').value.trim();
+            const input = document.getElementById('uv-address').value.trim();
             if (!input) return;
             
             let url = input;
