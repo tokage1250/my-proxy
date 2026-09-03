@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Proxy</title>
+    <title>Secure Proxy</title>
     <style>
         * {
             box-sizing: border-box;
@@ -82,6 +82,7 @@
     <div class="container">
         <h1>Secure Proxy</h1>
         <p>アクセスしたいURLを入力してください</p>
+        <!-- action="/proxy" に設定することでサーバー側のプロキシ機能に正しく渡されます -->
         <form action="/proxy" method="GET" class="search-box">
             <input type="text" name="url" placeholder="https://example.com" required autocomplete="off">
             <button type="submit">アクセス</button>
