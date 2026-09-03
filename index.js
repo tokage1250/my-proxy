@@ -5,15 +5,23 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ホーム画面として index.html を表示
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// プロキシ機能
-app.use('/proxy', (req, res, next) => {
-    let targetUrl = req.query.url;
-    if (!targetUrl) return res.status(400).send('URLが指定されていません');
+// フィルター回避用の暗号化対応プロキシ
+app.use('/fetch', (req, res, next) => {
+    let encodedUrl = req.query.q;
+    if (!encodedUrl) return res.status(400).send('URLが指定されていません');
+
+    let targetUrl;
+    try {
+        // Base64デコードして元のURLに戻す
+        targetUrl = Buffer.from(encodedUrl, 'base64').toString('utf8');
+    } catch (e) {
+        return res.status(400).send('無効なURLです');
+    }
+
     if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
         targetUrl = 'https://' + targetUrl;
     }
@@ -25,7 +33,7 @@ app.use('/proxy', (req, res, next) => {
         xfwd: true,
         router: () => targetUrl,
         on: {
-            proxyReq: (proxyReq, req, res) => {
+            proxyReq: (proxyReq) => {
                 proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
             }
         }

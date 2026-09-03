@@ -20,11 +20,22 @@
     <div class="container">
         <h1>Secure Proxy</h1>
         <p>アクセスしたいURLを入力してください</p>
-        <!-- ここが必ず /proxy になっている必要があります -->
-        <form action="/proxy" method="GET" class="search-box">
-            <input type="text" name="url" placeholder="https://example.com" required autocomplete="off">
+        <!-- フォーム送信時にURLをBase64に変換してフィルターを回避する -->
+        <form id="proxyForm" class="search-box">
+            <input type="text" id="urlInput" placeholder="https://example.com" required autocomplete="off">
             <button type="submit">アクセス</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById('proxyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let rawUrl = document.getElementById('urlInput').value.trim();
+            // URLをBase64にエンコード
+            let encoded = btoa(rawUrl);
+            // 変換した文字列を /fetch?q= に渡して移動する
+            window.location.href = '/fetch?q=' + encoded;
+        });
+    </script>
 </body>
 </html>
