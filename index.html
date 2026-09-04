@@ -347,13 +347,25 @@
             height: 54px;
 
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+
+            padding: 0 24px;
 
             color: #64748b;
-            font-size: 12px;
+            font-size: 11px;
 
             z-index: 5;
+
+            pointer-events: none;
+        }
+
+        .footer-left {
+            letter-spacing: 0.3px;
+        }
+
+        .footer-version {
+            letter-spacing: 0.3px;
         }
 
         /* スマホ */
@@ -513,7 +525,8 @@
 
 
     <footer>
-        Tokage Search
+        <span class="footer-left">aotoka</span>
+        <span class="footer-version">version 1.0.0</span>
     </footer>
 
 
