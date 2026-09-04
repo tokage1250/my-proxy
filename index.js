@@ -12,7 +12,13 @@ app.set('trust proxy', true);
 // トップページ
 // ==================================================
 app.get('/', (req, res) => {
+    app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// YouTube検索ページ
+app.get('/youtube.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'youtube.html'));
 });
 
 // ==================================================
