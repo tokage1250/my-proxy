@@ -1,18 +1,24 @@
-const express = require('express');
-const axios = require('axios');
-const path = require('path');
-const cheerio = require('cheerio');
+const express = require("express");
+const axios = require("axios");
+const path = require("path");
+const cheerio = require("cheerio");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.set('trust proxy', true);
+app.set("trust proxy", true);
 
-// ==================================================
+// HTMLなどを配信
+app.use(express.static(__dirname));
+
 // トップページ
-// ==================================================
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// YouTube検索ページ
+app.get("/youtube.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "youtube.html"));
 });
 
 // ==================================================
