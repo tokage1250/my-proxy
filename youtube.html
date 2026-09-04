@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Tokage YouTube</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        :root {
+            --bg: #081426;
+            --bg2: #0d1c33;
+            --card: rgba(17, 34, 58, 0.72);
+            --border: rgba(148, 163, 184, 0.18);
+            --text: #f8fafc;
+            --sub: #94a3b8;
+            --accent: #38bdf8;
+            --accent2: #818cf8;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            color: var(--text);
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Hiragino Kaku Gothic ProN",
+                "Yu Gothic",
+                Meiryo,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 50% 25%,
+                    rgba(56, 189, 248, 0.10),
+                    transparent 32%
+                ),
+                linear-gradient(
+                    135deg,
+                    var(--bg),
+                    var(--bg2)
+                );
+
+        }
+
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            background-image:
+                radial-gradient(
+                    rgba(148, 163, 184, 0.16) 1px,
+                    transparent 1px
+                );
+
+            background-size: 25px 25px;
+
+            opacity: 0.35;
+
+            pointer-events: none;
+
+        }
+
+
+        header {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 68px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 30px;
+
+            background:
+                rgba(8, 20, 38, 0.65);
+
+            border-bottom:
+                1px solid var(--border);
+
+            backdrop-filter:
+                blur(14px);
+
+            z-index: 10;
+
+        }
+
+
+        .brand {
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+        }
+
+
+        .brand span {
+
+            color: var(--accent);
+
+        }
+
+
+        .back {
+
+            color: var(--sub);
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+        }
+
+
+        .back:hover {
+
+            color: white;
+
+        }
+
+
+        main {
+
+            position: relative;
+
+            z-index: 2;
+
+            width: 100%;
+
+            min-height: 100vh;
+
+            padding:
+                130px 20px 90px;
+
+        }
+
+
+        .container {
+
+            width: 100%;
+
+            max-width: 900px;
+
+            margin: auto;
+
+        }
+
+
+        .title {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .youtube-icon {
+
+            width: 70px;
+
+            height: 48px;
+
+            margin: 0 auto 20px;
+
+            border-radius: 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 23px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #38bdf8,
+                    #6366f1
+                );
+
+            box-shadow:
+                0 15px 45px rgba(
+                    56,
+                    189,
+                    248,
+                    0.15
+                );
+
+        }
+
+
+        h1 {
+
+            font-size:
+                clamp(32px, 7vw, 58px);
+
+            font-weight: 800;
+
+            letter-spacing: -2px;
+
+            background:
+                linear-gradient(
+                    100deg,
+                    white,
+                    #bae6fd,
+                    #a5b4fc
+                );
+
+            -webkit-background-clip: text;
+
+            background-clip: text;
+
+            color: transparent;
+
+        }
+
+
+        .description {
+
+            color: var(--sub);
+
+            margin-top: 12px;
+
+            font-size: 14px;
+
+        }
+
+
+        .search-form {
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 7px;
+
+            margin-top: 32px;
+
+            background:
+                rgba(15, 31, 52, 0.85);
+
+            border:
+                1px solid
+                rgba(148, 163, 184, 0.24);
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0, 0, 0, 0.25);
+
+        }
+
+
+        .search-icon {
+
+            width: 50px;
+
+            text-align: center;
+
+            font-size: 21px;
+
+        }
+
+
+        #searchInput {
+
+            flex: 1;
+
+            min-width: 0;
+
+            height: 50px;
+
+            border: none;
+
+            outline: none;
+
+            background: transparent;
+
+            color: white;
+
+            font-size: 16px;
+
+        }
+
+
+        #searchInput::placeholder {
+
+            color: #64748b;
+
+        }
+
+
+        .search-button {
+
+            height: 50px;
+
+            padding:
+                0 24px;
+
+            border: none;
+
+            border-radius: 15px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0ea5e9,
+                    #6366f1
+                );
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+        }
+
+
+        .search-button:hover {
+
+            transform:
+                translateY(-1px);
+
+            filter:
+                brightness(1.08);
+
+        }
+
+
+        .hint {
+
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 12px;
+
+            margin-top: 15px;
+
+        }
+
+
+        .panel {
+
+            margin-top: 35px;
+
+            padding: 25px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 20px;
+
+            background:
+                rgba(15, 31, 52, 0.55);
+
+            text-align: center;
+
+        }
+
+
+        .panel-title {
+
+            color: #cbd5e1;
+
+            font-size: 14px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .panel-text {
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+
+        }
+
+
+        footer {
+
+            position: fixed;
+
+            bottom: 0;
+
+            left: 0;
+
+            right: 0;
+
+            height: 54px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 24px;
+
+            color: #64748b;
+
+            font-size: 11px;
+
+            pointer-events: none;
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            header {
+
+                padding:
+                    0 18px;
+
+            }
+
+
+            main {
+
+                padding:
+                    110px 15px 80px;
+
+            }
+
+
+            .search-form {
+
+                border-radius: 17px;
+
+            }
+
+
+            .search-button {
+
+                padding:
+                    0 17px;
+
+            }
+
+
+            #searchInput {
+
+                font-size: 14px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <a
+        href="/"
+        class="brand"
+    >
+        🦎 <span>Tokage</span> Search
+    </a>
+
+
+    <a
+        href="/"
+        class="back"
+    >
+        ← ホーム
+    </a>
+
+</header>
+
+
+<main>
+
+    <div class="container">
+
+
+        <div class="title">
+
+            <div class="youtube-icon">
+                ▶
+            </div>
+
+            <h1>
+                YouTube
+            </h1>
+
+            <p class="description">
+                Tokage SearchからYouTubeを検索
+            </p>
+
+        </div>
+
+
+        <form
+            id="youtubeForm"
+            class="search-form"
+        >
+
+            <div class="search-icon">
+                🔎
+            </div>
+
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="動画を検索..."
+                autocomplete="off"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="search-button"
+            >
+                検索
+            </button>
+
+        </form>
+
+
+        <div class="hint">
+            検索するとYouTubeの公式検索結果が開きます
+        </div>
+
+
+        <div class="panel">
+
+            <div class="panel-title">
+                YouTube Search
+            </div>
+
+            <div class="panel-text">
+                検索キーワードを入力して動画を探せます。<br>
+                動画の再生はYouTube公式サイトで行われます。
+            </div>
+
+        </div>
+
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <span>
+        aotoka
+    </span>
+
+    <span>
+        version 1.0.0
+    </span>
+
+</footer>
+
+
+<script>
+
+    const form =
+        document.getElementById(
+            "youtubeForm"
+        );
+
+
+    const input =
+        document.getElementById(
+            "searchInput"
+        );
+
+
+    form.addEventListener(
+        "submit",
+        function(e) {
+
+            e.preventDefault();
+
+
+            const query =
+                input.value.trim();
+
+
+            if (!query) {
+                return;
+            }
+
+
+            /*
+             * YouTube公式検索へ移動
+             */
+            const url =
+                "https://www.youtube.com/results?search_query=" +
+                encodeURIComponent(query);
+
+
+            window.location.href = url;
+
+        }
+    );
+
+
+    /*
+     * ページを開いたら検索欄に
+     * 自動フォーカス
+     */
+    window.addEventListener(
+        "load",
+        function() {
+
+            input.focus();
+
+        }
+    );
+
+</script>
+
+
+</body>
+</html>

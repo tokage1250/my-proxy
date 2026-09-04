@@ -16,7 +16,6 @@
         :root {
             --bg: #081426;
             --bg2: #0d1c33;
-            --card: rgba(17, 34, 58, 0.72);
             --border: rgba(148, 163, 184, 0.18);
             --text: #f8fafc;
             --sub: #94a3b8;
@@ -50,7 +49,6 @@
                 );
         }
 
-        /* 背景のドット */
         body::before {
             content: "";
             position: fixed;
@@ -67,7 +65,6 @@
             pointer-events: none;
         }
 
-        /* 上部 */
         header {
             position: fixed;
             top: 0;
@@ -94,7 +91,6 @@
         .brand-small {
             font-size: 18px;
             font-weight: 700;
-            letter-spacing: 0.3px;
         }
 
         .brand-small span {
@@ -118,7 +114,6 @@
             color: white;
         }
 
-        /* メイン */
         main {
             position: relative;
             z-index: 2;
@@ -139,7 +134,6 @@
             text-align: center;
         }
 
-        /* ロゴ */
         .logo-mark {
             width: 72px;
             height: 72px;
@@ -192,11 +186,6 @@
             font-size: 15px;
         }
 
-        /* 検索 */
-        .search-wrapper {
-            width: 100%;
-        }
-
         .search-box {
             display: flex;
             align-items: center;
@@ -234,7 +223,6 @@
 
         #urlInput {
             flex: 1;
-
             min-width: 0;
 
             height: 50px;
@@ -245,7 +233,6 @@
             background: transparent;
 
             color: white;
-
             font-size: 16px;
         }
 
@@ -275,9 +262,6 @@
                     #6366f1
                 );
 
-            box-shadow:
-                0 8px 25px rgba(99, 102, 241, 0.22);
-
             transition: 0.2s;
         }
 
@@ -286,11 +270,6 @@
             filter: brightness(1.08);
         }
 
-        .search-button:active {
-            transform: translateY(1px);
-        }
-
-        /* クイックアクセス */
         .quick-title {
             margin-top: 34px;
             margin-bottom: 13px;
@@ -337,7 +316,6 @@
             font-size: 16px;
         }
 
-        /* 下部 */
         footer {
             position: fixed;
             bottom: 0;
@@ -360,15 +338,6 @@
             pointer-events: none;
         }
 
-        .footer-left {
-            letter-spacing: 0.3px;
-        }
-
-        .footer-version {
-            letter-spacing: 0.3px;
-        }
-
-        /* スマホ */
         @media (max-width: 600px) {
 
             header {
@@ -397,10 +366,6 @@
                 letter-spacing: -2px;
             }
 
-            .subtitle {
-                font-size: 13px;
-            }
-
             .search-box {
                 min-height: 60px;
                 border-radius: 17px;
@@ -408,7 +373,6 @@
 
             .search-icon {
                 width: 42px;
-                font-size: 20px;
             }
 
             #urlInput {
@@ -417,7 +381,6 @@
 
             .search-button {
                 padding: 0 17px;
-                border-radius: 13px;
             }
         }
     </style>
@@ -425,178 +388,160 @@
 
 <body>
 
-    <header>
-        <div class="brand-small">
-            🦎 <span>Tokage</span> Search
+<header>
+
+    <div class="brand-small">
+        🦎 <span>Tokage</span> Search
+    </div>
+
+    <nav>
+        <a href="/">検索</a>
+        <a href="/youtube.html">YouTube</a>
+    </nav>
+
+</header>
+
+
+<main>
+
+    <div class="content">
+
+        <div class="logo-mark">
+            🦎
         </div>
 
-        <nav>
-            <a href="#" onclick="focusSearch(); return false;">検索</a>
-            <a href="#" onclick="showAbout(); return false;">About</a>
-        </nav>
-    </header>
+        <h1>Tokage Search</h1>
+
+        <p class="subtitle">
+            シンプルに、すばやくウェブへアクセス
+        </p>
 
 
-    <main>
-        <div class="content">
+        <form id="proxyForm">
 
-            <div class="logo-mark">
-                🦎
+            <div class="search-box">
+
+                <div class="search-icon">
+                    🔎
+                </div>
+
+                <input
+                    type="text"
+                    id="urlInput"
+                    placeholder="URLを入力してください"
+                    autocomplete="off"
+                    spellcheck="false"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="search-button"
+                >
+                    開く
+                </button>
+
             </div>
 
-            <h1>Tokage Search</h1>
-
-            <p class="subtitle">
-                シンプルに、すばやくウェブへアクセス
-            </p>
+        </form>
 
 
-            <form id="proxyForm" class="search-wrapper">
-
-                <div class="search-box">
-
-                    <div class="search-icon">
-                        🔎
-                    </div>
-
-                    <input
-                        type="text"
-                        id="urlInput"
-                        placeholder="URLを入力してください"
-                        autocomplete="off"
-                        spellcheck="false"
-                        required
-                    >
-
-                    <button
-                        type="submit"
-                        class="search-button"
-                    >
-                        開く
-                    </button>
-
-                </div>
-
-            </form>
+        <div class="quick-title">
+            QUICK ACCESS
+        </div>
 
 
-            <div class="quick-title">
-                QUICK ACCESS
+        <div class="quick-links">
+
+            <div
+                class="quick-link"
+                onclick="setURL('https://www.google.com')"
+            >
+                <span class="quick-icon">🔍</span>
+                Google
             </div>
 
-            <div class="quick-links">
 
-                <div
-                    class="quick-link"
-                    onclick="setURL('https://www.google.com')"
-                >
-                    <span class="quick-icon">🔍</span>
-                    Google
-                </div>
+            <!-- YouTubeボタン -->
+            <div
+                class="quick-link"
+                onclick="location.href='/youtube.html'"
+            >
+                <span class="quick-icon">▶</span>
+                YouTube
+            </div>
 
-                <div
-                    class="quick-link"
-                    onclick="setURL('https://github.com')"
-                >
-                    <span class="quick-icon">◉</span>
-                    GitHub
-                </div>
 
-                <div
-                    class="quick-link"
-                    onclick="setURL('https://discord.com')"
-                >
-                    <span class="quick-icon">💬</span>
-                    Discord
-                </div>
+            <div
+                class="quick-link"
+                onclick="setURL('https://github.com')"
+            >
+                <span class="quick-icon">◉</span>
+                GitHub
+            </div>
 
-                <div
-                    class="quick-link"
-                    onclick="setURL('https://www.youtube.com')"
-                >
-                    <span class="quick-icon">▶</span>
-                    YouTube
-                </div>
 
+            <div
+                class="quick-link"
+                onclick="setURL('https://discord.com')"
+            >
+                <span class="quick-icon">💬</span>
+                Discord
             </div>
 
         </div>
-    </main>
+
+    </div>
+
+</main>
 
 
-    <footer>
-        <span class="footer-left">aotoka</span>
-        <span class="footer-version">version 1.0.0</span>
-    </footer>
+<footer>
+
+    <span>aotoka</span>
+
+    <span>version 1.0.0</span>
+
+</footer>
 
 
-    <script>
+<script>
 
-        const form = document.getElementById("proxyForm");
-        const input = document.getElementById("urlInput");
+    const form = document.getElementById("proxyForm");
+    const input = document.getElementById("urlInput");
 
 
-        // URLをセット
-        function setURL(url) {
-            input.value = url;
-            input.focus();
+    function setURL(url) {
+        input.value = url;
+        input.focus();
+    }
+
+
+    form.addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+        let rawUrl = input.value.trim();
+
+        if (!rawUrl) {
+            return;
         }
 
 
-        // 検索欄へフォーカス
-        function focusSearch() {
-            input.focus();
-        }
+        try {
 
-
-        // About
-        function showAbout() {
-            alert(
-                "Tokage Search\n\n" +
-                "シンプルなウェブアクセス用UIです。"
-            );
-        }
-
-
-        // フォーム送信
-        form.addEventListener("submit", function(e) {
-
-            e.preventDefault();
-
-            let rawUrl = input.value.trim();
-
-            if (!rawUrl) {
-                return;
+            if (
+                !rawUrl.startsWith("http://") &&
+                !rawUrl.startsWith("https://")
+            ) {
+                rawUrl = "https://" + rawUrl;
             }
 
-            /*
-             * URLとして入力された場合
-             */
-            let target;
-
-            try {
-
-                if (
-                    !rawUrl.startsWith("http://") &&
-                    !rawUrl.startsWith("https://")
-                ) {
-                    rawUrl = "https://" + rawUrl;
-                }
-
-                target = new URL(rawUrl);
-
-            } catch (error) {
-
-                alert("有効なURLを入力してください。");
-                return;
-
-            }
+            const target = new URL(rawUrl);
 
 
             /*
-             * 既存の /fetch エンドポイントへ送信
-             *
-             * ※これは既存プロキシの接続部分です。
+             * 既存の /fetch に接続
              */
             const encoded = btoa(
                 unescape(
@@ -606,23 +551,22 @@
                 )
             );
 
+
             window.location.href =
                 "/fetch?q=" +
                 encodeURIComponent(encoded);
 
-        });
+        }
 
+        catch (error) {
 
-        // Enterキーでも操作しやすくする
-        input.addEventListener("keydown", function(e) {
+            alert("有効なURLを入力してください。");
 
-            if (e.key === "Enter") {
-                form.requestSubmit();
-            }
+        }
 
-        });
+    });
 
-    </script>
+</script>
 
 </body>
 </html>
