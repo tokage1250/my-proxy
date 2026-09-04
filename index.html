@@ -3,39 +3,613 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Proxy</title>
+
+    <title>Tokage Search</title>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { text-align: center; width: 100%; max-width: 600px; padding: 20px; }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        p { color: #94a3b8; margin-bottom: 30px; font-size: 1rem; }
-        .search-box { display: flex; background: #1e293b; border-radius: 50px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); border: 1px solid #334155; }
-        input[type="text"] { flex: 1; background: transparent; border: none; outline: none; padding: 0 20px; color: #fff; font-size: 1rem; }
-        input[type="text"]::placeholder { color: #64748b; }
-        button { background: linear-gradient(to right, #0ea5e9, #6366f1); color: white; border: none; padding: 12px 28px; border-radius: 40px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #081426;
+            --bg2: #0d1c33;
+            --card: rgba(17, 34, 58, 0.72);
+            --border: rgba(148, 163, 184, 0.18);
+            --text: #f8fafc;
+            --sub: #94a3b8;
+            --accent: #38bdf8;
+            --accent2: #818cf8;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+            color: var(--text);
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Hiragino Kaku Gothic ProN",
+                "Yu Gothic",
+                Meiryo,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 50% 35%,
+                    rgba(56, 189, 248, 0.10),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    var(--bg),
+                    var(--bg2)
+                );
+        }
+
+        /* 背景のドット */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+
+            background-image:
+                radial-gradient(
+                    rgba(148, 163, 184, 0.16) 1px,
+                    transparent 1px
+                );
+
+            background-size: 25px 25px;
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        /* 上部 */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 68px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+
+            border-bottom: 1px solid var(--border);
+
+            background: rgba(8, 20, 38, 0.55);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+
+            z-index: 10;
+        }
+
+        .brand-small {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-small span {
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--sub);
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        nav a:hover {
+            color: white;
+        }
+
+        /* メイン */
+        main {
+            position: relative;
+            z-index: 2;
+
+            width: 100%;
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 80px 20px;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 760px;
+            text-align: center;
+        }
+
+        /* ロゴ */
+        .logo-mark {
+            width: 72px;
+            height: 72px;
+
+            margin: 0 auto 22px;
+
+            border-radius: 22px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 38px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(56, 189, 248, 0.95),
+                    rgba(129, 140, 248, 0.95)
+                );
+
+            box-shadow:
+                0 15px 50px rgba(56, 189, 248, 0.18);
+        }
+
+        h1 {
+            font-size: clamp(42px, 8vw, 76px);
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: -3px;
+
+            background:
+                linear-gradient(
+                    100deg,
+                    #ffffff,
+                    #bae6fd 45%,
+                    #a5b4fc
+                );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            margin-top: 17px;
+            margin-bottom: 32px;
+
+            color: var(--sub);
+            font-size: 15px;
+        }
+
+        /* 検索 */
+        .search-wrapper {
+            width: 100%;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+
+            width: 100%;
+            min-height: 66px;
+
+            padding: 7px;
+
+            border-radius: 20px;
+
+            background: rgba(15, 31, 52, 0.85);
+
+            border: 1px solid rgba(148, 163, 184, 0.24);
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.28);
+
+            transition: 0.25s;
+        }
+
+        .search-box:focus-within {
+            border-color: rgba(56, 189, 248, 0.65);
+
+            box-shadow:
+                0 0 0 4px rgba(56, 189, 248, 0.08),
+                0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-icon {
+            width: 52px;
+            font-size: 23px;
+            color: #7dd3fc;
+        }
+
+        #urlInput {
+            flex: 1;
+
+            min-width: 0;
+
+            height: 50px;
+
+            border: none;
+            outline: none;
+
+            background: transparent;
+
+            color: white;
+
+            font-size: 16px;
+        }
+
+        #urlInput::placeholder {
+            color: #64748b;
+        }
+
+        .search-button {
+            height: 50px;
+
+            padding: 0 25px;
+
+            border: none;
+            border-radius: 15px;
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0ea5e9,
+                    #6366f1
+                );
+
+            box-shadow:
+                0 8px 25px rgba(99, 102, 241, 0.22);
+
+            transition: 0.2s;
+        }
+
+        .search-button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.08);
+        }
+
+        .search-button:active {
+            transform: translateY(1px);
+        }
+
+        /* クイックアクセス */
+        .quick-title {
+            margin-top: 34px;
+            margin-bottom: 13px;
+
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 9px 14px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background: rgba(15, 31, 52, 0.55);
+
+            color: #cbd5e1;
+
+            font-size: 13px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .quick-link:hover {
+            background: rgba(30, 58, 90, 0.7);
+            border-color: rgba(56, 189, 248, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .quick-icon {
+            font-size: 16px;
+        }
+
+        /* 下部 */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            height: 54px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            color: #64748b;
+            font-size: 12px;
+
+            z-index: 5;
+        }
+
+        /* スマホ */
+        @media (max-width: 600px) {
+
+            header {
+                padding: 0 18px;
+            }
+
+            nav {
+                gap: 12px;
+            }
+
+            nav a {
+                font-size: 12px;
+            }
+
+            main {
+                padding: 80px 15px;
+            }
+
+            .logo-mark {
+                width: 62px;
+                height: 62px;
+                font-size: 32px;
+            }
+
+            h1 {
+                letter-spacing: -2px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .search-box {
+                min-height: 60px;
+                border-radius: 17px;
+            }
+
+            .search-icon {
+                width: 42px;
+                font-size: 20px;
+            }
+
+            #urlInput {
+                font-size: 14px;
+            }
+
+            .search-button {
+                padding: 0 17px;
+                border-radius: 13px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Secure Proxy</h1>
-        <p>アクセスしたいURLを入力してください</p>
-        <!-- フォーム送信時にURLをBase64に変換してフィルターを回避する -->
-        <form id="proxyForm" class="search-box">
-            <input type="text" id="urlInput" placeholder="https://example.com" required autocomplete="off">
-            <button type="submit">アクセス</button>
-        </form>
-    </div>
+
+    <header>
+        <div class="brand-small">
+            🦎 <span>Tokage</span> Search
+        </div>
+
+        <nav>
+            <a href="#" onclick="focusSearch(); return false;">検索</a>
+            <a href="#" onclick="showAbout(); return false;">About</a>
+        </nav>
+    </header>
+
+
+    <main>
+        <div class="content">
+
+            <div class="logo-mark">
+                🦎
+            </div>
+
+            <h1>Tokage Search</h1>
+
+            <p class="subtitle">
+                シンプルに、すばやくウェブへアクセス
+            </p>
+
+
+            <form id="proxyForm" class="search-wrapper">
+
+                <div class="search-box">
+
+                    <div class="search-icon">
+                        🔎
+                    </div>
+
+                    <input
+                        type="text"
+                        id="urlInput"
+                        placeholder="URLを入力してください"
+                        autocomplete="off"
+                        spellcheck="false"
+                        required
+                    >
+
+                    <button
+                        type="submit"
+                        class="search-button"
+                    >
+                        開く
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <div class="quick-title">
+                QUICK ACCESS
+            </div>
+
+            <div class="quick-links">
+
+                <div
+                    class="quick-link"
+                    onclick="setURL('https://www.google.com')"
+                >
+                    <span class="quick-icon">🔍</span>
+                    Google
+                </div>
+
+                <div
+                    class="quick-link"
+                    onclick="setURL('https://github.com')"
+                >
+                    <span class="quick-icon">◉</span>
+                    GitHub
+                </div>
+
+                <div
+                    class="quick-link"
+                    onclick="setURL('https://discord.com')"
+                >
+                    <span class="quick-icon">💬</span>
+                    Discord
+                </div>
+
+                <div
+                    class="quick-link"
+                    onclick="setURL('https://www.youtube.com')"
+                >
+                    <span class="quick-icon">▶</span>
+                    YouTube
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+
+    <footer>
+        Tokage Search
+    </footer>
+
 
     <script>
-        document.getElementById('proxyForm').addEventListener('submit', function(e) {
+
+        const form = document.getElementById("proxyForm");
+        const input = document.getElementById("urlInput");
+
+
+        // URLをセット
+        function setURL(url) {
+            input.value = url;
+            input.focus();
+        }
+
+
+        // 検索欄へフォーカス
+        function focusSearch() {
+            input.focus();
+        }
+
+
+        // About
+        function showAbout() {
+            alert(
+                "Tokage Search\n\n" +
+                "シンプルなウェブアクセス用UIです。"
+            );
+        }
+
+
+        // フォーム送信
+        form.addEventListener("submit", function(e) {
+
             e.preventDefault();
-            let rawUrl = document.getElementById('urlInput').value.trim();
-            // URLをBase64にエンコード
-            let encoded = btoa(rawUrl);
-            // 変換した文字列を /fetch?q= に渡して移動する
-            window.location.href = '/fetch?q=' + encoded;
+
+            let rawUrl = input.value.trim();
+
+            if (!rawUrl) {
+                return;
+            }
+
+            /*
+             * URLとして入力された場合
+             */
+            let target;
+
+            try {
+
+                if (
+                    !rawUrl.startsWith("http://") &&
+                    !rawUrl.startsWith("https://")
+                ) {
+                    rawUrl = "https://" + rawUrl;
+                }
+
+                target = new URL(rawUrl);
+
+            } catch (error) {
+
+                alert("有効なURLを入力してください。");
+                return;
+
+            }
+
+
+            /*
+             * 既存の /fetch エンドポイントへ送信
+             *
+             * ※これは既存プロキシの接続部分です。
+             */
+            const encoded = btoa(
+                unescape(
+                    encodeURIComponent(
+                        target.toString()
+                    )
+                )
+            );
+
+            window.location.href =
+                "/fetch?q=" +
+                encodeURIComponent(encoded);
+
         });
+
+
+        // Enterキーでも操作しやすくする
+        input.addEventListener("keydown", function(e) {
+
+            if (e.key === "Enter") {
+                form.requestSubmit();
+            }
+
+        });
+
     </script>
+
 </body>
 </html>
