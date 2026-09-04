@@ -12,156 +12,152 @@ app.set('trust proxy', true);
 // トップページ
 // ==================================================
 app.get('/', (req, res) => {
-res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // ==================================================
 // Base64
 // ==================================================
 function encodeTargetUrl(url) {
-return encodeURIComponent(
-Buffer.from(url, 'utf8').toString('base64')
-);
+    return encodeURIComponent(
+        Buffer.from(url, 'utf8').toString('base64')
+    );
 }
 
 function decodeTargetUrl(value) {
-try {
-return Buffer.from(value, 'base64').toString('utf8');
-} catch {
-return null;
-}
+    try {
+        return Buffer.from(value, 'base64').toString('utf8');
+    } catch {
+        return null;
+    }
 }
 
 // ==================================================
 // プロキシURL
 // ==================================================
 function makeProxyUrl(url) {
-return /fetch?q=${encodeTargetUrl(url)};
+    return `/fetch?q=${encodeTargetUrl(url)}`;
 }
 
 // ==================================================
 // URL書き換え
 // ==================================================
 function rewriteUrl(originalUrl, baseUrl) {
-if (!originalUrl) return originalUrl;
+    if (!originalUrl) return originalUrl;
 
-const value = originalUrl.trim();
-
-if (
-    value.startsWith('data:') ||
-    value.startsWith('javascript:') ||
-    value.startsWith('mailto:') ||
-    value.startsWith('tel:') ||
-    value.startsWith('blob:') ||
-    value.startsWith('#')
-) {
-    return value;
-}
-
-try {
-    const absolute = new URL(value, baseUrl);
+    const value = originalUrl.trim();
 
     if (
-        absolute.protocol !== 'http:' &&
-        absolute.protocol !== 'https:'
+        value.startsWith('data:') ||
+        value.startsWith('javascript:') ||
+        value.startsWith('mailto:') ||
+        value.startsWith('tel:') ||
+        value.startsWith('blob:') ||
+        value.startsWith('#')
     ) {
         return value;
     }
 
-    const hash = absolute.hash;
-    absolute.hash = '';
+    try {
+        const absolute = new URL(value, baseUrl);
 
-    return makeProxyUrl(absolute.toString()) + hash;
-} catch {
-    return value;
-}
+        if (
+            absolute.protocol !== 'http:' &&
+            absolute.protocol !== 'https:'
+        ) {
+            return value;
+        }
 
+        const hash = absolute.hash;
+        absolute.hash = '';
+
+        return makeProxyUrl(absolute.toString()) + hash;
+    } catch {
+        return value;
+    }
 }
 
 // ==================================================
 // srcset
 // ==================================================
 function rewriteSrcset(value, baseUrl) {
-if (!value) return value;
+    if (!value) return value;
 
-return value
-    .split(',')
-    .map(item => {
-        const parts = item.trim().split(/\s+/);
+    return value
+        .split(',')
+        .map(item => {
+            const parts = item.trim().split(/\s+/);
 
-        if (!parts.length) {
-            return item;
-        }
+            if (!parts.length) {
+                return item;
+            }
 
-        parts[0] = rewriteUrl(
-            parts[0],
-            baseUrl
-        );
+            parts[0] = rewriteUrl(
+                parts[0],
+                baseUrl
+            );
 
-        return parts.join(' ');
-    })
-    .join(', ');
-
+            return parts.join(' ');
+        })
+        .join(', ');
 }
 
 // ==================================================
 // CSS
 // ==================================================
 function rewriteCss(css, baseUrl) {
-return css.replace(
-/url(\s*(['"]?)(.?)\1\s)/gi,
-(match, quote, url) => {
-const trimmed = url.trim();
+    return css.replace(
+        /url\(\s*(['"]?)(.*?)\1\s*\)/gi,
+        (match, quote, url) => {
+            const trimmed = url.trim();
 
-        if (
-            !trimmed ||
-            trimmed.startsWith('data:') ||
-            trimmed.startsWith('blob:') ||
-            trimmed.startsWith('#')
-        ) {
-            return match;
+            if (
+                !trimmed ||
+                trimmed.startsWith('data:') ||
+                trimmed.startsWith('blob:') ||
+                trimmed.startsWith('#')
+            ) {
+                return match;
+            }
+
+            return `url(${quote}${rewriteUrl(
+                trimmed,
+                baseUrl
+            )}${quote})`;
         }
-
-        return `url(${quote}${rewriteUrl(
-            trimmed,
-            baseUrl
-        )}${quote})`;
-    }
-);
-
+    );
 }
 
 // ==================================================
 // Cookie
 // ==================================================
 function rewriteSetCookie(setCookie) {
-if (!setCookie) return [];
+    if (!setCookie) return [];
 
-const cookies = Array.isArray(setCookie)
-    ? setCookie
-    : [setCookie];
+    const cookies = Array.isArray(setCookie)
+        ? setCookie
+        : [setCookie];
 
-return cookies.map(cookie => {
-    return cookie
-        .replace(/;\s*Domain=[^;]+/gi, '')
-        .replace(
-            /;\s*SameSite=None/gi,
-            '; SameSite=Lax'
-        );
-});
-
+    return cookies.map(cookie => {
+        return cookie
+            .replace(/;\s*Domain=[^;]+/gi, '')
+            .replace(
+                /;\s*SameSite=None/gi,
+                '; SameSite=Lax'
+            );
+    });
 }
 
 // ==================================================
 // HTMLエスケープ
 // ==================================================
 function escapeHtml(value) {
-return String(value)
-.replace(/&/g, '&')
-.replace(/</g, '<')
-.replace(/>/g, '>')
-.replace(/"/g, '"')
-.replace(/'/g, ''');
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 // ==================================================
@@ -169,7 +165,7 @@ return String(value)
 // ==================================================
 function injectDiagnosticScript($, targetUrl) {
 
-const script = `
+    const script = `
 
 <script>
 (() => {
@@ -622,312 +618,311 @@ const script = `
 
 `;
 
-if ($('head').length) {
-    $('head').prepend(script);
-} else if ($('body').length) {
-    $('body').prepend(script);
-} else {
-    $.root().prepend(script);
-}
-
+    if ($('head').length) {
+        $('head').prepend(script);
+    } else if ($('body').length) {
+        $('body').prepend(script);
+    } else {
+        $.root().prepend(script);
+    }
 }
 
 // ==================================================
 // /fetch
 // ==================================================
 app.use(
-'/fetch',
-express.raw({
-type: '/',
-limit: '25mb'
-}),
-async (req, res) => {
+    '/fetch',
+    express.raw({
+        type: '/',
+        limit: '25mb'
+    }),
+    async (req, res) => {
 
-    const encodedUrl =
-        req.query.q;
+        const encodedUrl =
+            req.query.q;
 
-    if (!encodedUrl) {
-        return res
-            .status(400)
-            .send(
-                'URLが指定されていません'
-            );
-    }
-
-    const targetUrl =
-        decodeTargetUrl(
-            encodedUrl
-        );
-
-    if (!targetUrl) {
-        return res
-            .status(400)
-            .send(
-                '無効なURLです'
-            );
-    }
-
-    let parsedTarget;
-
-    try {
-        parsedTarget =
-            new URL(targetUrl);
-    } catch {
-        return res
-            .status(400)
-            .send(
-                '無効なURLです'
-            );
-    }
-
-    if (
-        parsedTarget.protocol !== 'http:' &&
-        parsedTarget.protocol !== 'https:'
-    ) {
-        return res
-            .status(400)
-            .send(
-                'HTTP/HTTPS以外のURLは使用できません'
-            );
-    }
-
-    // ==========================================
-    // サーバー側診断ログ
-    // ==========================================
-    console.log('');
-    console.log(
-        '========================================'
-    );
-
-    console.log(
-        '[PROXY REQUEST]'
-    );
-
-    console.log(
-        'Method:',
-        req.method
-    );
-
-    console.log(
-        'Target:',
-        targetUrl
-    );
-
-    console.log(
-        'Browser Referer:',
-        req.headers.referer || '(なし)'
-    );
-
-    console.log(
-        'Browser Origin:',
-        req.headers.origin || '(なし)'
-    );
-
-    console.log(
-        '========================================'
-    );
-
-    try {
-
-        const headers = {
-            'User-Agent':
-                req.headers['user-agent'] ||
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
-
-            'Accept':
-                req.headers['accept'] ||
-                '*/*',
-
-            'Accept-Language':
-                req.headers['accept-language'] ||
-                'ja,en-US;q=0.9,en;q=0.8',
-
-            'Referer':
-                parsedTarget.origin
-        };
-
-        if (req.headers.cookie) {
-            headers.Cookie =
-                req.headers.cookie;
+        if (!encodedUrl) {
+            return res
+                .status(400)
+                .send(
+                    'URLが指定されていません'
+                );
         }
 
-        if (req.headers['content-type']) {
-            headers['Content-Type'] =
-                req.headers['content-type'];
+        const targetUrl =
+            decodeTargetUrl(
+                encodedUrl
+            );
+
+        if (!targetUrl) {
+            return res
+                .status(400)
+                .send(
+                    '無効なURLです'
+                );
         }
 
-        let requestData;
+        let parsedTarget;
+
+        try {
+            parsedTarget =
+                new URL(targetUrl);
+        } catch {
+            return res
+                .status(400)
+                .send(
+                    '無効なURLです'
+                );
+        }
 
         if (
-            req.method !== 'GET' &&
-            req.method !== 'HEAD' &&
-            req.body &&
-            Buffer.isBuffer(req.body)
+            parsedTarget.protocol !== 'http:' &&
+            parsedTarget.protocol !== 'https:'
         ) {
-            requestData =
-                req.body;
+            return res
+                .status(400)
+                .send(
+                    'HTTP/HTTPS以外のURLは使用できません'
+                );
         }
 
         // ==========================================
-        // 上流アクセス
+        // サーバー側診断ログ
         // ==========================================
-        const response =
-            await axios({
-                method: req.method,
-                url: targetUrl,
-                headers: headers,
-                data: requestData,
-                responseType: 'arraybuffer',
-                validateStatus: () => true,
-
-                // リダイレクトを記録するため
-                // 自動追従しない
-                maxRedirects: 0,
-
-                timeout: 20000
-            });
-
-        // ==========================================
-        // レスポンス診断
-        // ==========================================
+        console.log('');
         console.log(
-            '[UPSTREAM RESPONSE]',
-            response.status,
+            '========================================'
+        );
+
+        console.log(
+            '[PROXY REQUEST]'
+        );
+
+        console.log(
+            'Method:',
+            req.method
+        );
+
+        console.log(
+            'Target:',
             targetUrl
         );
 
         console.log(
-            '[UPSTREAM CONTENT-TYPE]',
-            response.headers[
-                'content-type'
-            ] || '(なし)'
+            'Browser Referer:',
+            req.headers.referer || '(なし)'
         );
 
-        // ==========================================
-        // リダイレクト診断
-        // ==========================================
-        if (
-            response.status >= 300 &&
-            response.status < 400 &&
-            response.headers.location
-        ) {
+        console.log(
+            'Browser Origin:',
+            req.headers.origin || '(なし)'
+        );
 
-            const redirectTarget =
-                new URL(
-                    response.headers.location,
-                    targetUrl
-                ).toString();
+        console.log(
+            '========================================'
+        );
 
-            console.warn(
-                '[UPSTREAM REDIRECT]'
-            );
+        try {
 
-            console.warn(
-                'FROM:',
+            const headers = {
+                'User-Agent':
+                    req.headers['user-agent'] ||
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+
+                'Accept':
+                    req.headers['accept'] ||
+                    '*/*',
+
+                'Accept-Language':
+                    req.headers['accept-language'] ||
+                    'ja,en-US;q=0.9,en;q=0.8',
+
+                'Referer':
+                    parsedTarget.origin
+            };
+
+            if (req.headers.cookie) {
+                headers.Cookie =
+                    req.headers.cookie;
+            }
+
+            if (req.headers['content-type']) {
+                headers['Content-Type'] =
+                    req.headers['content-type'];
+            }
+
+            let requestData;
+
+            if (
+                req.method !== 'GET' &&
+                req.method !== 'HEAD' &&
+                req.body &&
+                Buffer.isBuffer(req.body)
+            ) {
+                requestData =
+                    req.body;
+            }
+
+            // ==========================================
+            // 上流アクセス
+            // ==========================================
+            const response =
+                await axios({
+                    method: req.method,
+                    url: targetUrl,
+                    headers: headers,
+                    data: requestData,
+                    responseType: 'arraybuffer',
+                    validateStatus: () => true,
+
+                    // リダイレクトを記録するため
+                    // 自動追従しない
+                    maxRedirects: 0,
+
+                    timeout: 20000
+                });
+
+            // ==========================================
+            // レスポンス診断
+            // ==========================================
+            console.log(
+                '[UPSTREAM RESPONSE]',
+                response.status,
                 targetUrl
             );
 
-            console.warn(
-                'LOCATION:',
+            console.log(
+                '[UPSTREAM CONTENT-TYPE]',
+                response.headers[
+                    'content-type'
+                ] || '(なし)'
+            );
+
+            // ==========================================
+            // リダイレクト診断
+            // ==========================================
+            if (
+                response.status >= 300 &&
+                response.status < 400 &&
                 response.headers.location
-            );
+            ) {
 
-            console.warn(
-                'RESOLVED:',
-                redirectTarget
-            );
-
-            // 通常のプロキシ処理
-            res.status(
-                response.status
-            );
-
-            res.set(
-                'Location',
-                makeProxyUrl(
-                    redirectTarget
-                )
-            );
-
-            return res.end();
-        }
-
-        // ==========================================
-        // Cookie
-        // ==========================================
-        if (
-            response.headers['set-cookie']
-        ) {
-            res.set(
-                'Set-Cookie',
-                rewriteSetCookie(
-                    response.headers[
-                        'set-cookie'
-                    ]
-                )
-            );
-        }
-
-        const contentType =
-            response.headers[
-                'content-type'
-            ] || '';
-
-        // ==========================================
-        // 規制ページ診断
-        // ==========================================
-        if (
-            contentType
-                .toLowerCase()
-                .includes('text/html')
-        ) {
-
-            const upstreamHtml =
-                response.data.toString(
-                    'utf8'
-                );
-
-            const isBlockPage =
-                upstreamHtml.includes(
-                    'このウェブサイトは現在管理者によって規制されています'
-                ) ||
-                upstreamHtml.includes(
-                    'INTERSAFE'
-                ) ||
-                upstreamHtml.includes(
-                    'Gateway Connection'
-                );
-
-            if (isBlockPage) {
+                const redirectTarget =
+                    new URL(
+                        response.headers.location,
+                        targetUrl
+                    ).toString();
 
                 console.warn(
-                    '========================================'
+                    '[UPSTREAM REDIRECT]'
                 );
 
                 console.warn(
-                    '[BLOCK PAGE DETECTED]'
-                );
-
-                console.warn(
-                    'Target:',
+                    'FROM:',
                     targetUrl
                 );
 
                 console.warn(
-                    'This response appears to be a network filter page.'
+                    'LOCATION:',
+                    response.headers.location
                 );
 
                 console.warn(
-                    '========================================'
+                    'RESOLVED:',
+                    redirectTarget
                 );
 
-                return res
-                    .status(451)
-                    .set(
-                        'Content-Type',
-                        'text/html; charset=utf-8'
+                // 通常のプロキシ処理
+                res.status(
+                    response.status
+                );
+
+                res.set(
+                    'Location',
+                    makeProxyUrl(
+                        redirectTarget
                     )
-                    .send(`
+                );
+
+                return res.end();
+            }
+
+            // ==========================================
+            // Cookie
+            // ==========================================
+            if (
+                response.headers['set-cookie']
+            ) {
+                res.set(
+                    'Set-Cookie',
+                    rewriteSetCookie(
+                        response.headers[
+                            'set-cookie'
+                        ]
+                    )
+                );
+            }
+
+            const contentType =
+                response.headers[
+                    'content-type'
+                ] || '';
+
+            // ==========================================
+            // 規制ページ診断
+            // ==========================================
+            if (
+                contentType
+                    .toLowerCase()
+                    .includes('text/html')
+            ) {
+
+                const upstreamHtml =
+                    response.data.toString(
+                        'utf8'
+                    );
+
+                const isBlockPage =
+                    upstreamHtml.includes(
+                        'このウェブサイトは現在管理者によって規制されています'
+                    ) ||
+                    upstreamHtml.includes(
+                        'INTERSAFE'
+                    ) ||
+                    upstreamHtml.includes(
+                        'Gateway Connection'
+                    );
+
+                if (isBlockPage) {
+
+                    console.warn(
+                        '========================================'
+                    );
+
+                    console.warn(
+                        '[BLOCK PAGE DETECTED]'
+                    );
+
+                    console.warn(
+                        'Target:',
+                        targetUrl
+                    );
+
+                    console.warn(
+                        'This response appears to be a network filter page.'
+                    );
+
+                    console.warn(
+                        '========================================'
+                    );
+
+                    return res
+                        .status(451)
+                        .set(
+                            'Content-Type',
+                            'text/html; charset=utf-8'
+                        )
+                        .send(`
 
 <!DOCTYPE html>
 
@@ -1372,27 +1367,26 @@ ${escapeHtml(targetUrl)}
 // OPTIONS
 // ==================================================
 app.options(
-'/fetch',
-(req, res) => {
+    '/fetch',
+    (req, res) => {
 
-    res.set(
-        'Access-Control-Allow-Origin',
-        '*'
-    );
+        res.set(
+            'Access-Control-Allow-Origin',
+            '*'
+        );
 
-    res.set(
-        'Access-Control-Allow-Methods',
-        'GET,POST,PUT,PATCH,DELETE,OPTIONS'
-    );
+        res.set(
+            'Access-Control-Allow-Methods',
+            'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+        );
 
-    res.set(
-        'Access-Control-Allow-Headers',
-        '*'
-    );
+        res.set(
+            'Access-Control-Allow-Headers',
+            '*'
+        );
 
-    res.sendStatus(204);
-}
-
+        res.sendStatus(204);
+    }
 );
 
 // ==================================================
@@ -1400,21 +1394,21 @@ app.options(
 // ==================================================
 app.listen(PORT, () => {
 
-console.log(
-    '========================================'
-);
+    console.log(
+        '========================================'
+    );
 
-console.log(
-    'Proxy server started'
-);
+    console.log(
+        'Proxy server started'
+    );
 
-console.log(
-    'PORT:',
-    PORT
-);
+    console.log(
+        'PORT:',
+        PORT
+    );
 
-console.log(
-    '========================================'
-);
+    console.log(
+        '========================================'
+    );
 
 });
