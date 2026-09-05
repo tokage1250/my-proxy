@@ -152,7 +152,7 @@ function escapeHtml(value) {
 }
 
 // ==================================================
-// ★ 診断機能
+// ★ 診断機能 & フォーム送信自動修正スクリプト
 // ==================================================
 function injectDiagnosticScript($, targetUrl) {
     const script = `
@@ -171,120 +171,69 @@ function injectDiagnosticScript($, targetUrl) {
         }
     }
 
+    function makeProxyUrl(url) {
+        const base64 = btoa(unescape(encodeURIComponent(url)));
+        return '/fetch?q=' + encodeURIComponent(base64);
+    }
+
+    // 検索・フォーム送信時のURL崩れ（URLが指定されていませんエラー）を防ぐインターセプト
+    document.addEventListener('submit', event => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement)) return;
+
+        const actionAttr = form.getAttribute('action') || '';
+        const method = (form.getAttribute('method') || 'GET').toUpperCase();
+        const resolvedAction = resolveUrl(actionAttr || location.href);
+
+        if (method === 'GET') {
+            event.preventDefault();
+            try {
+                const urlObj = new URL(resolvedAction);
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (typeof value === 'string') {
+                        urlObj.searchParams.set(key, value);
+                    }
+                }
+                location.href = makeProxyUrl(urlObj.toString());
+            } catch (e) {
+                console.error('[PROXY SUBMIT ERROR]', e);
+            }
+        } else {
+            try {
+                form.setAttribute('action', makeProxyUrl(resolvedAction));
+            } catch (e) {
+                console.error('[PROXY POST ACTION ERROR]', e);
+            }
+        }
+    }, true);
+
     function checkUrl(source, url) {
         const resolved = resolveUrl(url);
         console.log('[PROXY URL]', source, { original: url, resolved: resolved });
-        if (resolved.includes('chiebukuro.yahoo.co.jp')) {
-            console.warn('[PROXY WARNING] Yahoo!知恵袋へのURLを検出:', resolved);
-        }
         return resolved;
     }
-
-    function inspectForms() {
-        document.querySelectorAll('form').forEach((form, index) => {
-            const action = form.getAttribute('action') || location.href;
-            const method = (form.getAttribute('method') || 'GET').toUpperCase();
-            console.log('[PROXY FORM]', { index, method, action, resolved: resolveUrl(action) });
-            if (resolveUrl(action).includes('chiebukuro.yahoo.co.jp')) {
-                console.warn('[PROXY WARNING] FORM送信先:', resolveUrl(action));
-            }
-        });
-    }
-
-    inspectForms();
 
     document.querySelectorAll('a[href]').forEach((link, index) => {
         checkUrl('A[' + index + ']', link.getAttribute('href'));
     });
-
-    document.addEventListener('submit', event => {
-        const form = event.target;
-        if (!(form instanceof HTMLFormElement)) return;
-        const action = form.getAttribute('action') || location.href;
-        const method = (form.getAttribute('method') || 'GET').toUpperCase();
-        console.log('[PROXY SUBMIT]', { method, action, resolved: resolveUrl(action) });
-
-        const data = {};
-        try {
-            new FormData(form).forEach((value, key) => {
-                if (typeof value === 'string') data[key] = value;
-            });
-            console.log('[PROXY FORM DATA]', data);
-        } catch (error) {
-            console.warn('[PROXY FORM DATA ERROR]', error);
-        }
-    }, true);
-
-    document.addEventListener('click', event => {
-        let element = event.target;
-        if (element && element.closest) {
-            element = element.closest('a,button,input[type="submit"],input[type="button"]');
-        }
-        if (!element) return;
-
-        console.log('[PROXY CLICK]', {
-            tag: element.tagName,
-            id: element.id || '',
-            name: element.getAttribute('name') || '',
-            type: element.getAttribute('type') || '',
-            href: element.getAttribute('href') || '',
-            formAction: element.getAttribute('formaction') || ''
-        });
-
-        const href = element.getAttribute('href');
-        const formAction = element.getAttribute('formaction');
-        if (href) checkUrl('CLICK href', href);
-        if (formAction) checkUrl('CLICK formaction', formAction);
-    }, true);
 
     const originalFetch = window.fetch;
     window.fetch = function(input, init) {
         try {
             const url = typeof input === 'string' ? input : input && input.url;
             if (url) checkUrl('FETCH', url);
-        } catch (error) {
-            console.warn('[PROXY FETCH CHECK ERROR]', error);
-        }
+        } catch (error) {}
         return originalFetch.apply(this, arguments);
     };
 
     const originalXhrOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
         try {
-            console.log('[PROXY XHR]', { method, url, resolved: resolveUrl(url) });
             checkUrl('XHR', url);
-        } catch (error) {
-            console.warn('[PROXY XHR ERROR]', error);
-        }
+        } catch (error) {}
         return originalXhrOpen.call(this, method, url, async, user, password);
     };
-
-    const originalWindowOpen = window.open;
-    window.open = function(url, ...args) {
-        if (url) checkUrl('WINDOW.OPEN', url);
-        return originalWindowOpen.call(window, url, ...args);
-    };
-
-    window.addEventListener('beforeunload', () => {
-        console.warn('[PROXY NAVIGATION]', 'ページ離脱が発生しました');
-        console.warn('[PROXY NAVIGATION] 現在URL:', location.href);
-    });
-
-    window.addEventListener('popstate', () => {
-        console.log('[PROXY POPSTATE]', location.href);
-    });
-
-    window.addEventListener('hashchange', () => {
-        console.log('[PROXY HASHCHANGE]', location.href);
-    });
-
-    let lastUrl = location.href;
-    setInterval(() => {
-        if (location.href !== lastUrl) {
-            console.warn('[PROXY URL CHANGED]', { before: lastUrl, after: location.href });
-            lastUrl = location.href;
-        }
-    }, 500);
 })();
 </script>`;
 
@@ -301,7 +250,10 @@ function injectDiagnosticScript($, targetUrl) {
 // /fetch プロキシ処理
 // ==================================================
 app.use('/fetch', express.raw({ type: '/', limit: '25mb' }), async (req, res) => {
-    const encodedUrl = req.query.q;
+    let encodedUrl = req.query.q;
+    if (Array.isArray(encodedUrl)) {
+        encodedUrl = encodedUrl[encodedUrl.length - 1];
+    }
 
     if (!encodedUrl) {
         return res.status(400).send('URLが指定されていません');
@@ -327,8 +279,6 @@ app.use('/fetch', express.raw({ type: '/', limit: '25mb' }), async (req, res) =>
     console.log('[PROXY REQUEST]');
     console.log('Method:', req.method);
     console.log('Target:', targetUrl);
-    console.log('Browser Referer:', req.headers.referer || '(なし)');
-    console.log('Browser Origin:', req.headers.origin || '(なし)');
     console.log('========================================');
 
     try {
@@ -360,16 +310,10 @@ app.use('/fetch', express.raw({ type: '/', limit: '25mb' }), async (req, res) =>
         });
 
         console.log('[UPSTREAM RESPONSE]', response.status, targetUrl);
-        console.log('[UPSTREAM CONTENT-TYPE]', response.headers['content-type'] || '(なし)');
 
         // リダイレクト処理
         if (response.status >= 300 && response.status < 400 && response.headers.location) {
             const redirectTarget = new URL(response.headers.location, targetUrl).toString();
-            console.warn('[UPSTREAM REDIRECT]');
-            console.warn('FROM:', targetUrl);
-            console.warn('LOCATION:', response.headers.location);
-            console.warn('RESOLVED:', redirectTarget);
-
             res.status(response.status);
             res.set('Location', makeProxyUrl(redirectTarget));
             return res.end();
@@ -390,11 +334,6 @@ app.use('/fetch', express.raw({ type: '/', limit: '25mb' }), async (req, res) =>
                                 upstreamHtml.includes('Gateway Connection');
 
             if (isBlockPage) {
-                console.warn('========================================');
-                console.warn('[BLOCK PAGE DETECTED]');
-                console.warn('Target:', targetUrl);
-                console.warn('========================================');
-
                 return res.status(451).set('Content-Type', 'text/html; charset=utf-8').send(`
 <!DOCTYPE html>
 <html lang="ja">
@@ -422,29 +361,6 @@ h1 { font-size: 24px; }
             }
 
             const $ = cheerio.load(upstreamHtml, { decodeEntities: false });
-
-            console.log('[HTML URL DIAGNOSTIC]');
-            $('form').each((index, el) => {
-                const action = $(el).attr('action') || '';
-                const method = ($(el).attr('method') || 'GET').toUpperCase();
-                try {
-                    const resolved = new URL(action || targetUrl, targetUrl).toString();
-                    console.log(`[FORM ${index}]`, { method, action, resolved });
-                } catch {
-                    console.warn(`[FORM ${index}] URL解析失敗`, action);
-                }
-            });
-
-            $('a[href]').each((index, el) => {
-                const href = $(el).attr('href');
-                if (!href) return;
-                try {
-                    const resolved = new URL(href, targetUrl).toString();
-                    if (resolved.includes('chiebukuro.yahoo.co.jp')) {
-                        console.warn(`[LINK ${index}] Yahoo URL:`, resolved);
-                    }
-                } catch {}
-            });
 
             $('base').remove();
             $('[integrity]').removeAttr('integrity');
