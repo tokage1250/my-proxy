@@ -9,9 +9,14 @@ const PORT = process.env.PORT || 3000;
 app.set("trust proxy", true);
 
 // ==================================================
-// HTMLなどの静的ファイル配信
+// ミドルウェアの設定
 // ==================================================
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// HTMLなどの静的ファイル配信
 app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // トップページ
 app.get("/", (req, res) => {
@@ -22,6 +27,28 @@ app.get("/", (req, res) => {
 app.get("/youtube.html", (req, res) => {
     res.sendFile(path.join(__dirname, "youtube.html"));
 });
+
+// ==================================================
+// ルーティング・APIの読み込み
+// ==================================================
+try {
+    app.use('/api/tube', require('./routes/wakametube'));
+    app.use('/api/game', require('./routes/game'));
+    app.use('/api/music', require('./routes/music'));
+    app.use('/api/tools', require('./routes/tools'));
+} catch (e) {
+    console.log('Some routes are missing, running with base configuration.');
+}
+
+// YouTube API連携用のモジュール読み込み
+try {
+    const youtubeRouter = require('./server/youtube');
+    if (youtubeRouter) {
+        app.use('/api/youtube', youtubeRouter);
+    }
+} catch (e) {
+    console.log('YouTube router module not found, skipping.');
+}
 
 // ==================================================
 // Base64
@@ -497,7 +524,7 @@ app.options('/fetch', (req, res) => {
 // ==================================================
 app.listen(PORT, () => {
     console.log('========================================');
-    console.log('Tokage Search Proxy started');
+    console.log('Tokage Search Proxy & App started');
     console.log('PORT:', PORT);
     console.log('========================================');
 });
