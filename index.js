@@ -176,19 +176,23 @@ function injectDiagnosticScript($, targetUrl) {
         return '/fetch?q=' + encodeURIComponent(base64);
     }
 
-    // 検索・フォーム送信時のURL崩れ（URLが指定されていませんエラー）を防ぐインターセプト
+    // フォーム送信時に確実にTARGET_BASEを基準にして次のページへ飛ぶように修正
     document.addEventListener('submit', event => {
         const form = event.target;
         if (!(form instanceof HTMLFormElement)) return;
 
         const actionAttr = form.getAttribute('action') || '';
         const method = (form.getAttribute('method') || 'GET').toUpperCase();
-        const resolvedAction = resolveUrl(actionAttr || location.href);
+        
+        let targetAction = TARGET_BASE;
+        if (actionAttr) {
+            targetAction = resolveUrl(actionAttr);
+        }
 
         if (method === 'GET') {
             event.preventDefault();
             try {
-                const urlObj = new URL(resolvedAction);
+                const urlObj = new URL(targetAction);
                 const formData = new FormData(form);
                 for (const [key, value] of formData.entries()) {
                     if (typeof value === 'string') {
@@ -201,7 +205,7 @@ function injectDiagnosticScript($, targetUrl) {
             }
         } else {
             try {
-                form.setAttribute('action', makeProxyUrl(resolvedAction));
+                form.setAttribute('action', makeProxyUrl(targetAction));
             } catch (e) {
                 console.error('[PROXY POST ACTION ERROR]', e);
             }
