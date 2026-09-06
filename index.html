@@ -450,43 +450,47 @@
             QUICK ACCESS
         </div>
 
-
+        <!-- カスタマイズされた QUICK ACCESS ボタン -->
         <div class="quick-links">
 
             <div
                 class="quick-link"
-                onclick="setURL('https://www.google.com')"
+                onclick="location.href='https://klmanga.work/'"
             >
-                <span class="quick-icon">🔍</span>
-                Google
+                <span class="quick-icon">📖</span>
+                漫画raw1
             </div>
-
-
-            <!-- YouTubeボタン -->
-            <div
-                class="quick-link"
-                onclick="location.href='/youtube.html'"
-            >
-                <span class="quick-icon">▶</span>
-                YouTube
-            </div>
-
 
             <div
                 class="quick-link"
-                onclick="setURL('https://github.com')"
+                onclick="location.href='https://klmanga.work/page/2/'"
             >
-                <span class="quick-icon">◉</span>
-                GitHub
+                <span class="quick-icon">📚</span>
+                漫画raw2
             </div>
-
 
             <div
                 class="quick-link"
-                onclick="setURL('https://discord.com')"
+                onclick="location.href='https://web-production-cb9f8.up.railway.app/wkt'"
             >
-                <span class="quick-icon">💬</span>
-                Discord
+                <span class="quick-icon">🌿</span>
+                わかめ
+            </div>
+
+            <div
+                class="quick-link"
+                onclick="openQuickProxy('https://gogoanime.by/')"
+            >
+                <span class="quick-icon">🎬</span>
+                アニメ
+            </div>
+
+            <div
+                class="quick-link"
+                onclick="location.href='https://padlet.com/akmaron5/ipad-isgc-aaich8o88bopb563'"
+            >
+                <span class="quick-icon">🚪</span>
+                回避部屋
             </div>
 
         </div>
@@ -516,6 +520,19 @@
         input.focus();
     }
 
+    // プロキシ経由で開くための専用関数（アニメボタン用）
+    function openQuickProxy(targetUrl) {
+        try {
+            const encoded = btoa(
+                unescape(
+                    encodeURIComponent(targetUrl)
+                )
+            );
+            window.location.href = "/fetch?q=" + encodeURIComponent(encoded);
+        } catch (error) {
+            alert("URLの変換に失敗しました。");
+        }
+    }
 
     form.addEventListener("submit", function(e) {
 
@@ -526,7 +543,6 @@
         if (!rawUrl) {
             return;
         }
-
 
         try {
 
@@ -539,7 +555,6 @@
 
             const target = new URL(rawUrl);
 
-
             /*
              * 既存の /fetch に接続
              */
@@ -550,7 +565,6 @@
                     )
                 )
             );
-
 
             window.location.href =
                 "/fetch?q=" +
